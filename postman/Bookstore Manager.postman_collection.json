@@ -1,0 +1,22 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Bookstore Manager",
+		"_postman_id": "a31743a5-d374-8bf8-f33a-2c499650b51a",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET hello endpoint",
+			"request": {
+				"url": "{{url}}/api/v1/books",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
