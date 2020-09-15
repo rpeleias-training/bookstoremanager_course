@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/publishers")
@@ -34,5 +35,10 @@ public class PublisherController implements PublisherControllerDocs {
     @GetMapping("/{id}")
     public PublisherDTO findById(@PathVariable Long id) {
         return publisherService.findById(id);
+    }
+
+    @GetMapping
+    public List<PublisherDTO> findAll() {
+        return publisherService.findAll();
     }
 }
