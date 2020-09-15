@@ -19,6 +19,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import static com.rodrigopeleias.bookstoremanager.utils.JsonConversionUtils.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,5 +72,20 @@ public class PublisherControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedCreatedPublisherDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenGETWithValidIdIsCalledThenOkStatusShouldBeInformed() throws Exception {
+        PublisherDTO expectedCreatedPublisherDTO = publisherDTOBuilder.buildPublisherDTO();
+        Long expectedCreatedPublisherDTOId = expectedCreatedPublisherDTO.getId();
+
+        when(publisherService.findById(expectedCreatedPublisherDTOId)).thenReturn(expectedCreatedPublisherDTO);
+
+        mockMvc.perform(get(PUBLISHERS_API_URL_PATH + "/" + expectedCreatedPublisherDTOId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(expectedCreatedPublisherDTOId.intValue())))
+                .andExpect(jsonPath("$.name", is(expectedCreatedPublisherDTO.getName())))
+                .andExpect(jsonPath("$.code", is(expectedCreatedPublisherDTO.getCode())));
     }
 }
