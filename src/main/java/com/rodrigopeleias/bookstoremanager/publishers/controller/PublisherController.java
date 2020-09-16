@@ -4,6 +4,7 @@ import com.rodrigopeleias.bookstoremanager.publishers.dto.PublisherDTO;
 import com.rodrigopeleias.bookstoremanager.publishers.service.PublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +41,11 @@ public class PublisherController implements PublisherControllerDocs {
     @GetMapping
     public List<PublisherDTO> findAll() {
         return publisherService.findAll();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        publisherService.delete(id);
     }
 }
