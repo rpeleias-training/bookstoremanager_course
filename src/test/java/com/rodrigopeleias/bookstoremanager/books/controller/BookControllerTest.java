@@ -6,8 +6,6 @@ import com.rodrigopeleias.bookstoremanager.books.dto.BookRequestDTO;
 import com.rodrigopeleias.bookstoremanager.books.dto.BookResponseDTO;
 import com.rodrigopeleias.bookstoremanager.books.service.BookService;
 import com.rodrigopeleias.bookstoremanager.users.dto.AuthenticatedUser;
-import com.rodrigopeleias.bookstoremanager.utils.JsonConversionUtils;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,21 +15,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.Collections;
 
-import static com.rodrigopeleias.bookstoremanager.utils.JsonConversionUtils.*;
-import static org.hamcrest.Matchers.*;
+import static com.rodrigopeleias.bookstoremanager.utils.JsonConversionUtils.asJsonString;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class BookControllerTest {
@@ -126,5 +126,24 @@ public class BookControllerTest {
         mockMvc.perform(delete(BOOKS_API_URL_PATH + "/" + expectedBookToDeleteDTO.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void whenPUTIsCalledThenOkStatusShouldBeReturned() throws Exception {
+        BookRequestDTO expectedBookToUpdateDTO = bookRequestDTOBuilder.buildRequestBookDTO();
+        BookResponseDTO expectedUpdatedBookDTO = bookResponseDTOBuilder.buildBookResponse();
+
+        when(bookService.updateByIdAndUser(
+                any(AuthenticatedUser.class),
+                eq(expectedBookToUpdateDTO.getId()),
+                eq(expectedBookToUpdateDTO))).thenReturn(expectedUpdatedBookDTO);
+
+        mockMvc.perform(put(BOOKS_API_URL_PATH + "/" + expectedBookToUpdateDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(expectedBookToUpdateDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(expectedUpdatedBookDTO.getId().intValue())))
+                .andExpect(jsonPath("$.name", is(expectedUpdatedBookDTO.getName())))
+                .andExpect(jsonPath("$.isbn", is(expectedUpdatedBookDTO.getIsbn())));
     }
 }

@@ -87,4 +87,20 @@ public class BookService {
                     .orElseThrow(() -> new BookNotFoundException(bookId));
     }
 
+    public BookResponseDTO updateByIdAndUser(AuthenticatedUser authenticatedUser, Long bookId, BookRequestDTO bookRequestDTO) {
+        User foundAuthenticatedUser = userService.verifyAndGetUserIfExists(authenticatedUser.getUsername());
+        Book foundBook = verifyAndGetIfExists(bookId, foundAuthenticatedUser);
+        Author foundAuthor = authorService.verifyAndGetIfExists(bookRequestDTO.getAuthorId());
+        Publisher foundPublisher = publisherService.verifyAndGetIfExists(bookRequestDTO.getPublisherId());
+
+        Book bookToUpdate = bookMapper.toModel(bookRequestDTO);
+        bookToUpdate.setId(foundBook.getId());
+        bookToUpdate.setUser(foundAuthenticatedUser);
+        bookToUpdate.setAuthor(foundAuthor);
+        bookToUpdate.setPublisher(foundPublisher);
+        bookToUpdate.setCreatedDate(foundBook.getCreatedDate());
+        Book updatedBook = bookRepository.save(bookToUpdate);
+        return bookMapper.toDTO(updatedBook);
+    }
+
 }
