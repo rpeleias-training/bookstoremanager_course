@@ -18,6 +18,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class BookService {
@@ -53,6 +56,15 @@ public class BookService {
         return bookRepository.findByIdAndUser(bookId, foundAuthenticatedUser)
                 .map(bookMapper::toDTO)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
+    }
+
+    public List<BookResponseDTO> findAllByUser(AuthenticatedUser authenticatedUser) {
+        User foundAuthenticatedUser = userService.verifyAndGetUserIfExists(authenticatedUser.getUsername());
+        return bookRepository.findAllByUser(foundAuthenticatedUser)
+                .stream()
+                .map(bookMapper::toDTO)
+                .collect(Collectors.toList());
+
     }
 
     private void verifyIfBookIsAlreadyRegistered(User foundUser, BookRequestDTO bookRequestDTO) {
