@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/books")
@@ -41,5 +42,10 @@ public class BookController implements BookControllerDocs {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable Long bookId) {
         return bookService.findByIdAndUser(authenticatedUser, bookId);
+    }
+
+    @GetMapping
+    public List<BookResponseDTO> findAllByUser(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return bookService.findAllByUser(authenticatedUser);
     }
 }
