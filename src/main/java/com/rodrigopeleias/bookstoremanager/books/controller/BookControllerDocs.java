@@ -18,4 +18,11 @@ public interface BookControllerDocs {
     })
     BookResponseDTO create(AuthenticatedUser authenticatedUser, BookRequestDTO bookRequestDTO);
 
+    @ApiOperation(value = "Book find by id and user operation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success book found"),
+            @ApiResponse(code = 404, message = "Book not found error")
+    })
+    BookResponseDTO findByIdAndUser(AuthenticatedUser authenticatedUser, Long bookId);
+
 }
