@@ -16,7 +16,6 @@ import com.rodrigopeleias.bookstoremanager.publishers.service.PublisherService;
 import com.rodrigopeleias.bookstoremanager.users.dto.AuthenticatedUser;
 import com.rodrigopeleias.bookstoremanager.users.entity.User;
 import com.rodrigopeleias.bookstoremanager.users.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
@@ -184,5 +183,40 @@ public class BookServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class, () -> bookService.deleteByIdAndUser(authenticatedUser, expectedBookToDeleteDTO.getId()));
+    }
+
+    @Test
+    void whenExistingBookIdIsInformedThenItShouldBeUpdated() {
+        BookRequestDTO expectedBookToUpdateDTO = bookRequestDTOBuilder.buildRequestBookDTO();
+        BookResponseDTO expectedUpdatedBookDTO = bookResponseDTOBuilder.buildBookResponse();
+        Book expectedUpdatedBook = bookMapper.toModel(expectedUpdatedBookDTO);
+
+        when(userService.verifyAndGetUserIfExists(authenticatedUser.getUsername())).thenReturn(new User());
+        when(bookRepository.findByIdAndUser(eq(expectedBookToUpdateDTO.getId()), any(User.class)))
+                .thenReturn(Optional.of(expectedUpdatedBook));
+        when(authorService.verifyAndGetIfExists(expectedBookToUpdateDTO.getAuthorId())).thenReturn(new Author());
+        when(publisherService.verifyAndGetIfExists(expectedBookToUpdateDTO.getPublisherId())).thenReturn(new Publisher());
+        when(bookRepository.save(any(Book.class))).thenReturn(expectedUpdatedBook);
+
+        BookResponseDTO updatedBookResponseDTO = bookService.updateByIdAndUser(
+                authenticatedUser,
+                expectedBookToUpdateDTO.getId(),
+                expectedBookToUpdateDTO);
+
+        assertThat(updatedBookResponseDTO, is(equalTo(expectedUpdatedBookDTO)));
+    }
+
+    @Test
+    void whenNotExistingBookIdIsInformedThennExceptionShouldBeThrown() {
+        BookRequestDTO expectedBookToUpdateDTO = bookRequestDTOBuilder.buildRequestBookDTO();
+
+        when(userService.verifyAndGetUserIfExists(authenticatedUser.getUsername())).thenReturn(new User());
+        when(bookRepository.findByIdAndUser(eq(expectedBookToUpdateDTO.getId()), any(User.class)))
+                .thenReturn(Optional.empty());
+
+        assertThrows(BookNotFoundException.class, () -> bookService.updateByIdAndUser(
+                authenticatedUser,
+                expectedBookToUpdateDTO.getId(),
+                expectedBookToUpdateDTO));
     }
 }
