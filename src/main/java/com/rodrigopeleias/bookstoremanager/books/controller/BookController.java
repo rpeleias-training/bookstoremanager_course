@@ -7,6 +7,8 @@ import com.rodrigopeleias.bookstoremanager.users.dto.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,5 +34,12 @@ public class BookController implements BookControllerDocs {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestBody @Valid BookRequestDTO bookRequestDTO) {
         return bookService.create(authenticatedUser, bookRequestDTO);
+    }
+
+    @GetMapping("/{bookId}")
+    public BookResponseDTO findByIdAndUser(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable Long bookId) {
+        return bookService.findByIdAndUser(authenticatedUser, bookId);
     }
 }
